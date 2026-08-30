@@ -1,0 +1,18 @@
+# MileStone 1: 
+    1. created client(react) and server(express);
+    2. server (in js);
+    3. express, cors, dotenv and app creation
+    4. dotenv -> fetching config from env
+    5. using cors as middleware
+    6. creation of app
+    7. checking health endpoints
+    8. running server which fetching port from env;
+
+# Milestone 2:
+    1. creating scripts folder and fetchCF file
+    2. in fetchcf:
+    3. fetching data using fetch at codeforced userdata url
+    4. filtering data using filter wrt to problem and ok verdict
+    5. deduping the fetched data, filtering unique submission and mapping recently successful resubmission (if any)
+    6. finding the submission size of unique map
+    7. logging data and 3 recently submitted questions data
