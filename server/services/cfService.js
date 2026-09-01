@@ -1,81 +1,81 @@
 //todo: add simple in-mem cache 
 
-const cache = [];
+const cache = {};
 
-cache['test'] = {
-    data:'hellow', 
-    expiresAt: Date.now() + 3000
-}
-
-function checkCache(key){
-    const cached = cache[key];
+async function getCFStats(handle){
+    const cached =  cache[handle];
 
     if(cached && Date.now() < cached.expiresAt){
-        console.log('Cache Hit: ', cached.data);
+        console.log('Cache Hit: for', handle);
+        return cached.data;
+
     }else{
-        console.log('Oops... Cache miss, data not found!!');
-    }
+        console.log('chache miss... fetching fresh data for', handle);
+        const data = await fetchFromCF(handle);
+        cache[handle] = {
+            data,
+            expiresAt: Date.now() + 10*60*1000
+        }
+        return data;
+    }   
 }
 
-checkCache('test');
+async function fetchFromCF(handle){
 
-setTimeout(() => {
-    checkCache('test');
-}, 3000);
+    const [response1, response2] = await Promise.all([
+        fetch(`https://codeforces.com/api/user.status?handle=${handle}`),
+        fetch(`https://codeforces.com/api/user.info?handles=${handle}`)
+    ]);
 
+    const userSubmission = await response1.json();
+    const userProfile = await response2.json();
 
-// cache[handle] = {
-//     data: someStatsObject,
-//     expirestAt: Date.now() + 10 * 60 * 1000
-// };
+    //todo: implement filter to result to only verdict === 'OK'
+    const requiredSubmission = userSubmission.result.filter(s => s.verdict === 'OK');
 
-
-// function getCfHandle(handle){
-//     const cached = cache[handle];
-
-//     if(cached && Date.now () < cache.expirestAt){
-//         console.log('cache hit');
-//         return cached.data;
-//     }
-
-//     console.log('cache miss, fetching fresh data');
-
-//     main();
-// }
-
-
-
-// async function main(){
-//     const response1 = await fetch("https://codeforces.com/api/user.status?handle=Vasu.609");    
-//     const response2 = await fetch("https://codeforces.com/api/user.info?handles=Vasu.609");
-//     const userSubmission = await response1.json();
-//     const userProfile = await response2.json();
-
-//     //todo: implement filter to result to only verdict === 'OK'
-//     const requiredSubmission = userSubmission.result.filter(s => s.verdict === 'OK');
-
-//     //todo: dedupe by problem.contestID + '-' + problem.index (use set or map)
-//     const uniqueResultMap = new Map(
-//         requiredSubmission.map(s => [`${s.problem.contestId} - ${s.problem.index}`, s])
-//     )
+    //todo: dedupe by problem.contestID + '-' + problem.index (use set or map)
+    const uniqueResultMap = new Map(
+        requiredSubmission.map(s => [`${s.problem.contestId} - ${s.problem.index}`, s])
+    )
     
 
-//     //todo: log the count of unique solved problem and log just first 3 deduped problem (with rating and tags)
-//     const uniqueSubmissions = [...uniqueResultMap.values()];
-//     const profile = userProfile.result[0];
+    //todo: log the count of unique solved problem and log just first 3 deduped problem (with rating and tags)
+    const uniqueSubmissions = [...uniqueResultMap.values()];
+    const profile = userProfile.result[0];
 
-//     console.log('Username: ', profile.handle);
-//     console.log('Rank: ', profile.rank || 'Unrated');
-//     console.log('Rating', profile.rating || 0);
-//     console.log('Unique solved count:', uniqueSubmissions.length);
-//     console.log(uniqueSubmissions.slice(0, 3).map(s =>({
-//         name: s.problem.name,
-//         rating: s.problem.rating,
-//         id: s.problem.contestId,
-//         index: s.problem.index,
-//         tags: s.problem.tags
-//     })))
+    const response = {
+        username: profile.handle,
+        rank: profile.rank || 'Unrated',
+        rating: profile.rating || 0,
+        problemSolved: uniqueSubmissions.length,
+        problems: uniqueSubmissions.slice(0, 3).map(s => ({
+            name: s.problem.name,
+            rating: s.problem.rating,
+            id: s.problem.contestId,
+            index: s.problem.index,
+            tags: s.problem.tags
+        }))
+    };
 
-//     // fetch -> filter ok -> deduplicate -> count total number of problem solved -> log result
+    return response;
 
-// }
+    // fetch -> filter ok -> deduplicate -> count total number of problem solved -> log result
+
+}
+
+
+function logData(data) {
+    console.log('');
+    console.log('Username:', data.username);
+    console.log('Rank:', data.rank);
+    console.log('Rating:', data.rating);
+    console.log('Unique solved count:', data.problemSolved);
+    console.log('Problems:', data.problems);
+}
+
+async function run(handle){
+    const data = await getCFStats(handle);
+    logData(data);
+}
+
+module.exports = run;
