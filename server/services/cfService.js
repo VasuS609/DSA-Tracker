@@ -48,7 +48,7 @@ async function fetchFromCF(handle){
         rank: profile.rank || 'Unrated',
         rating: profile.rating || 0,
         problemSolved: uniqueSubmissions.length,
-        problems: uniqueSubmissions.slice(0, 3).map(s => ({
+        problems: uniqueSubmissions.slice(0, 6).map(s => ({
             name: s.problem.name,
             rating: s.problem.rating,
             id: s.problem.contestId,
