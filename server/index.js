@@ -11,6 +11,15 @@ app.get('/api/health', (req, res) => {
     res.json({status: 'ok'});
 })
 
+api.get('/api/cf/stats/: handle', async (req, res) => {
+ //todo: call getCFStatus(req.param.handle) send as JSON;
+    
+
+ //todo: wrap in try/catchy, err -> 500
+
+
+})
+
 app.listen(process.env.PORT, () => {
     console.log(`Server is running on port: ${process.env.PORT}`);
 })
