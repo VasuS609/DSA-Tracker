@@ -22,13 +22,10 @@ async function getCFStats(handle){
 
 async function fetchFromCF(handle){
 
-    const [response1, response2] = await Promise.all([
-        fetch(`https://codeforces.com/api/user.status?handle=${handle}`),
-        fetch(`https://codeforces.com/api/user.info?handles=${handle}`)
+    const [userSubmission, userProfile] = await Promise.all([
+        fetchJson(`https://codeforces.com/api/user.status?handle=${handle}`),
+        fetchJson(`https://codeforces.com/api/user.info?handles=${handle}`)
     ]);
-
-    const userSubmission = await response1.json();
-    const userProfile = await response2.json();
 
     //todo: implement filter to result to only verdict === 'OK'
     const requiredSubmission = userSubmission.result.filter(s => s.verdict === 'OK');
@@ -64,18 +61,20 @@ async function fetchFromCF(handle){
 }
 
 
-function logData(data) {
-    console.log('');
-    console.log('Username:', data.username);
-    console.log('Rank:', data.rank);
-    console.log('Rating:', data.rating);
-    console.log('Unique solved count:', data.problemSolved);
-    console.log('Problems:', data.problems);
+async function fetchJson(url){
+    const response = await fetch(url);
+    
+    if(!response.ok){
+        const text = await response.text();
+        throw new Error(`Codeforces API Error ${response.status}: ${text.slice(0, 200)}`);
+    }
+
+    return await response.json();
 }
+
 
 async function run(handle){
     const data = await getCFStats(handle);
-    logData(data);
 }
 
 module.exports = run;
