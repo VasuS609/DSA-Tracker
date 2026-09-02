@@ -75,6 +75,7 @@ async function fetchJson(url){
 
 async function run(handle){
     const data = await getCFStats(handle);
+    return data;
 }
 
 module.exports = run;
