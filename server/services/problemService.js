@@ -16,18 +16,6 @@ function getProblemsByDate(date){
     return stmt.all(date);
 }
 
-addProblem({
-    date: '2026-09-03',
-    name: 'Two Sum',
-    url: 'https://leetcode.com/problems/two-sum/',
-    rating: 1000,
-    source: 'leetcode',
-    tags: 'array,hashmap'
-});
-
-
-console.log(getProblemsByDate('2026-09-03'));
-
 module.exports = {
     addProblem
     ,getProblemsByDate
