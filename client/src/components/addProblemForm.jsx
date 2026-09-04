@@ -2,7 +2,7 @@
 import { useState } from "react"
 
 
-function FormController(){
+function AddProblemForm(){
 
     const [formData, setFormData] = useState({
         date : '',
@@ -89,4 +89,4 @@ function FormController(){
     )
 }
 
-export default FormController;
+export default AddProblemForm;
