@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const run = require('./services/cfService');
-const {addProblem, getProblemsByDate} = require('./services/problemService');
+const {addProblem, getProblemsByDate, getGoalProgress} = require('./services/problemService');
 
 dotenv.config();
 
@@ -73,6 +73,17 @@ app.get('/api/problems/:date', (req, res) => {
 
   // 3. try/catch, 500 on failure
 });
+
+
+app.get('/api/goal/:date', (req, res) =>{
+  try{
+    const progress = getGoalProgress(req.params.date);
+    res.json(progress);
+  }catch(e){
+    console.error(e);
+    res.status(500).json({error: "Failed to get the progress"});
+  }
+})
 
 
 const port = process.env.PORT || 5000;

@@ -17,30 +17,28 @@ function getProblemsByDate(date){
     return stmt.all(date);
 }
 
+
 function getGoalProgress(date){
-    const stmt = db.prepare(`
-        SELECT rating, COUNT(*) as count
-        FROM problem
-        WHERE date = ?
-        GROUP BY rating
-        `);
+    const activeGoals = db.prepare('SELECT * FROM goals WHERE active = 1').all();
 
-    const counts = stmt.all(date);
+    const countstmt = db.prepare('SELECT COUNT(*) as count FROM problem WHERE date = ? AND rating = ?');
 
-    // const solved1100 = counts.find(item => item.rating == 1100) ? counts[rating == 1100] : 0;
-    // const solved1000 = counts.find(item => item.rating == 1000) ? counts[rating == 1000] : 0;
-    
-    const match1100 = counts.find(item => item.rating == 1100);
-    const solved1100 = match1100 ? match1100.count : 0;
+    const breakdown = activeGoals.map( goal =>{
+            const result = countstmt.all(date, goal.rating)[0];
 
-    const match1000 = counts.find(item => item.rating == 1000);
-    const solved1000 = match1000 ? match1000.count : 0;
+            return{
+                rating: goal.rating,
+                required: goal.count_required,
+                solved: result.count,
+                met: result.count >= goal.count_required
+            }
+    });
 
-    let goalMet = false;
-    if(solved1000 >= 1 && solved1100 >= 2) goalMet = true;
-    
-    return goalMet;
+    const allGoalMet = breakdown.every(g => g.met);
+
+    return {date, breakdown, allGoalMet};
 }
+
 
 module.exports = {
     addProblem
