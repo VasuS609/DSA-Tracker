@@ -10,7 +10,7 @@ function GoalProgress(){
     useEffect(() =>{
         const today = new Date().toISOString().split('T')[0];
         
-        fetch(`http://localhost:5000/api/goal/:${today}`)
+        fetch(`http://localhost:5000/api/goal/${today}`)
         .then((res) =>{
             if(!res.ok) throw new Error('Error while fetching today CF Stats');
             return res.json();
@@ -24,7 +24,7 @@ function GoalProgress(){
             setLoading(false);
             console.error('Unexpected error occured while fetcing the progress');
         })
-    }, [date]);
+    }, []);
 
 
     if(loading == true){
@@ -41,11 +41,16 @@ function GoalProgress(){
 
   return(
     <div>
-       <h2>{progress.rating}</h2>
-       <h2>{progress.solved}</h2>
-       <h2>{progress.required}</h2>
-       <p>{progress.met}</p>
+       <h2>Today's Goal Progress</h2>
+       <ul>
+        {progress.breakdown.map(it => (
+           <li key={it.rating}>
+           {it.rating} : {it.solved}/{it.required} {it.met ? '✓' : '✗'}
+           </li>           
+        ))}
+       </ul>
 
+       <h2>{progress.allGoalMet ? 'Congrats!! All Goals Met' : 'Oops... Missed goals, keep grinding!'}  </h2>
     </div>
   )
 

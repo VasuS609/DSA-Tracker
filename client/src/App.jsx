@@ -1,5 +1,6 @@
 import AddProblemForm from "./components/addProblemForm"
 import CFDashboard from "./components/CFDashboard"
+import GoalProgress from "./components/GoalProgress"
 
 
 function App() {
@@ -8,6 +9,7 @@ function App() {
     <div>
       <CFDashboard handle="Vasu.609"/>
       <AddProblemForm/>
+      <GoalProgress/>
     </div>
   )
   
