@@ -1,8 +1,9 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
-const run = require('./services/cfService');
+const {cfStats, fetchRatingHistory} = require('./services/cfService');
 const {addProblem, getProblemsByDate, getGoalProgress} = require('./services/problemService');
+
 
 dotenv.config();
 
@@ -18,7 +19,7 @@ app.get('/api/health', (req, res) => {
 app.get('/api/cf/stats/:handle', async (req, res) => {
  //todo: call getCFStatus(req.param.handle) send as JSON;
     try{
-        const data = await run(req.params.handle);
+        const data = await cfStats(req.params.handle);
         res.json(data);
     }catch(e){
         console.error(e);
@@ -85,6 +86,18 @@ app.get('/api/goal/:date', (req, res) =>{
   }
 })
 
+
+app.get('/api/cf/rating/:handle', async(req, res) => {
+  try{
+    const history = await fetchRatingHistory(req.params.handle);
+    res.json(history);
+  }catch(e){
+    console.log(e);
+    res.status(500).json({
+      error:'Failed to fetch rating history'
+    });
+  }
+})
 
 const port = process.env.PORT || 5000;
 

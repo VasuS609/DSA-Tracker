@@ -73,9 +73,24 @@ async function fetchJson(url){
 }
 
 
-async function run(handle){
-    const data = await getCFStats(handle);
+async function fetchRatingHistory(handle) {
+    const resposne = await fetch(`https://codeforces.com/api/user.rating?handle=${handle}`);
+    const json = await resposne.json();
+
+
+    const data = json.result.map(item => {
+        const date = new Date(
+            item.ratingUpdateTimeSeconds * 1000
+        ).toISOString().split('T')[0];
+        const rating = item.newRating;
+
+        return {date, rating};
+    })
+
     return data;
 }
 
-module.exports = run;
+module.exports = {
+    getCFStats,
+    fetchRatingHistory
+}
