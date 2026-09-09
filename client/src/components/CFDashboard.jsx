@@ -1,4 +1,4 @@
-import useCFStats from "../hooks/useCFStats";
+import {useCFStats} from "../hooks/useCFStats";
 
 function CFDashboard({handle}){
     const {data, loading, error} = useCFStats(handle);

@@ -90,7 +90,10 @@ async function fetchRatingHistory(handle) {
     return data;
 }
 
-module.exports = {
-    getCFStats,
-    fetchRatingHistory
+async function run(handle){
+    const data = await getCFStats(handle);
+    return {data};
 }
+
+module.exports = run;
+module.exports.fetchRatingHistory = fetchRatingHistory;

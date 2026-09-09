@@ -1,7 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
-const {cfStats, fetchRatingHistory} = require('./services/cfService');
+const run = require('./services/cfService');
+const {fetchRatingHistory} = require('./services/cfService');
 const {addProblem, getProblemsByDate, getGoalProgress} = require('./services/problemService');
 
 
@@ -19,7 +20,7 @@ app.get('/api/health', (req, res) => {
 app.get('/api/cf/stats/:handle', async (req, res) => {
  //todo: call getCFStatus(req.param.handle) send as JSON;
     try{
-        const data = await cfStats(req.params.handle);
+        const data = await run(req.params.handle);
         res.json(data);
     }catch(e){
         console.error(e);
